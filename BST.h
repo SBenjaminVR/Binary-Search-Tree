@@ -24,6 +24,8 @@ class BST {
         bool operator==(BST const &treeOne);
         void mirror();
         int maxWidth();
+        int diameter();
+        bool isBalanced();
 
     private:
         NodeT *root;
@@ -41,6 +43,8 @@ class BST {
         bool compara(NodeT *r, NodeT *r2);
         void changeMirror(NodeT *r);
         NodeT* copyTree(NodeT *r, NodeT *originalTree);
+        int longestTree(NodeT *r, int &maxDiameter);
+        int checkBalance(NodeT *r, bool &balance);
 };
 
 BST::BST() {
@@ -498,33 +502,74 @@ int BST::maxWidth() {
     return maxNodes;
 }
 
-//LUNES
-//Copy constructor
-// Simular el recorrido en preorden sin usar el add
-// Usar recursividad
+int BST::longestTree(NodeT *r, int &maxDiameter) {
+    if (r == NULL) {
+        return 0;
+    }
 
-//operador ==
-// Recorrido en preorden de los 2 apuntadores, si en un momento son diferentes adios
+    int right = 0, left = 0;
+    left = longestTree(r->getLeft(), maxDiameter);
+    right = longestTree(r->getRight(), maxDiameter);
 
-// Mirror
-// Voltearlo, pruebalo y borrarlo al final
+    if (maxDiameter < left + right + 1) {
+        maxDiameter = left + right + 1;
+    }
 
-// nearstRelative
-// Si uno de los dos no existe, pues no, si son como padre e hijo, regresa el abuelo (el ancestro mas cercano)
+    if (left > right) {
+        return left + 1;
+    }
+    else {
+        return right + 1;
+    }
 
-// maxWidht
-// recorrido nivel por nivel y checar cuando hay cambio de nivel
+}
 
-// MIERCOLES
-//isBalanced
-// Cual es la altura de mi arbol izquierdo, cual es la altura del derecho, si la diferencia es menor de 1, adios
+int BST::diameter() {
+    if (root == NULL) {
+        return 0;
+    }
+    NodeT *curr = root;
+    int mayor, longest = 0;
 
-//diamater
-// Regresar la longitud maxima (Esta facil si entiendes el de altura) (Regresar un entero con la altura)
-// No esperen esto en el examen
+    mayor = longestTree(curr, longest);
 
-//isBalanced
-// es parte de lo que vamos a ver el martes
-//
+    return longest;
+}
+
+int BST::checkBalance(NodeT *r, bool &balance) {
+     if (balance) {
+        if (r == NULL) {
+            return 0;
+        }
+        int left = checkBalance(r->getLeft(), balance);
+        int right = checkBalance(r->getRight(), balance);
+
+        if (right - left  > 1 || right - left < - 1) {
+            balance = false;
+        }
+
+        if (left > right) {
+            return left + 1;
+        }
+        else {
+            return right + 1;
+        }
+     }
+}
+
+bool BST::isBalanced() {
+    if (root == NULL)
+        return true;
+    bool balance = true;
+    int check = checkBalance(root, balance);
+
+    if (balance) {
+        return true;
+    }
+    else {
+        return false;
+    }
+
+}
 
 #endif // BST_H_INCLUDED
